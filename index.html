@@ -73,7 +73,7 @@
       "icon": "🥥",
       "iconType": "coconut",
       "description": "Whole coconut served fresh & chilled",
-      "price": 5.00
+      "price": 4.00
     }
   ]
   </script>
@@ -90,9 +90,9 @@
       </div>
     </div>
 
-    <!-- Mode Toggle Button (Bar icon from drawing top right) -->
-    <button id="toggleBarModeBtn" onclick="requestBarAccess()" class="p-2.5 rounded-xl border border-red-500/60 bg-red-950/20 text-red-500 hover:bg-red-500 hover:text-black transition-all duration-200 relative group flex items-center justify-center">
-      <i data-lucide="shopping-bag" class="w-7 h-7"></i>
+    <!-- Mode Toggle Button (Bar service icon top right) -->
+    <button id="toggleBarModeBtn" onclick="requestBarAccess()" class="p-2.5 rounded-xl border border-red-500/60 bg-red-950/20 text-red-500 hover:bg-red-500 hover:text-black transition-all duration-200 relative group flex items-center justify-center" title="Toggle Bar Mode">
+      <i data-lucide="wine" class="w-7 h-7"></i>
       <span id="orderBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-black font-bold text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
     </button>
   </header>
@@ -184,23 +184,6 @@
         <button id="submitOrderBtn" onclick="confirmOrder()" class="w-full py-3.5 bg-red-600 hover:bg-red-500 text-black font-bold text-sm uppercase tracking-wider rounded-xl transition shadow-md shadow-red-900/50 flex items-center justify-center space-x-2">
           <span>Send Order (<span id="modalTotalPrice">$0.00</span>)</span>
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- BAR AUTH MODAL -->
-  <div id="barAuthModal" class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-black border-2 border-red-500 rounded-2xl p-6 w-full max-w-xs space-y-4 glow-box text-center">
-      <i data-lucide="shield-check" class="w-10 h-10 text-red-500 mx-auto"></i>
-      <h3 class="font-bold text-red-500">Bar Service Access</h3>
-      <p class="text-xs text-red-400/80">Enter password to enter bar queue management mode.</p>
-      
-      <input type="password" id="barPasswordInput" placeholder="Password" class="w-full bg-red-950/20 border border-red-500/60 rounded-xl p-3 text-center text-red-300 placeholder-red-700 focus:outline-none focus:border-red-500 text-sm">
-      <div id="authError" class="text-xs text-red-500 hidden font-bold">Incorrect password</div>
-
-      <div class="flex space-x-2 pt-2">
-        <button onclick="closeBarAuthModal()" class="w-1/2 py-2.5 bg-red-950/50 text-red-400 rounded-xl hover:bg-red-900/50 text-xs font-semibold">Cancel</button>
-        <button onclick="validateBarPassword()" class="w-1/2 py-2.5 bg-red-600 text-black rounded-xl hover:bg-red-500 text-xs font-bold uppercase">Enter</button>
       </div>
     </div>
   </div>
@@ -472,33 +455,16 @@
       }
     };
 
-    // Bar Mode Auth logic
+    // Bar Mode Direct Access (No password required)
     window.requestBarAccess = function() {
       if (isBarMode) {
         exitBarMode();
       } else {
-        document.getElementById('barAuthModal').classList.remove('hidden');
-        document.getElementById('barPasswordInput').focus();
-      }
-    };
-
-    window.closeBarAuthModal = function() {
-      document.getElementById('barAuthModal').classList.add('hidden');
-      document.getElementById('authError').classList.add('hidden');
-      document.getElementById('barPasswordInput').value = '';
-    };
-
-    window.validateBarPassword = function() {
-      const pass = document.getElementById('barPasswordInput').value;
-      if (pass === "trustme") {
         isBarMode = true;
-        closeBarAuthModal();
         document.getElementById('customerView').classList.add('hidden');
         document.getElementById('barView').classList.remove('hidden');
         renderBarOrders();
         showToast("Switched to Bar Mode");
-      } else {
-        document.getElementById('authError').classList.remove('hidden');
       }
     };
 
