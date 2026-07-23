@@ -1,294 +1,529 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sunset Beach Bar & Lounge - Order Drinks</title>
-  <!-- Tailwind CSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beachside Drinks Order</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
+  <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- QRCode.js library for client-side QR generation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            neonRed: '#ff3b30',
-            darkBg: '#0a0a0a',
-            cardBg: '#121214',
-            accentGlow: 'rgba(255, 59, 48, 0.15)',
-          }
-        }
-      }
-    }
-  </script>
   <style>
-    .neon-border {
-      border: 2px solid #ff3b30;
-      box-shadow: 0 0 12px rgba(255, 59, 48, 0.3), inset 0 0 8px rgba(255, 59, 48, 0.15);
-    }
-    .neon-text {
+    body {
+      background-color: #0d0d0d;
       color: #ff3b30;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    /* Neon Glow Effect */
+    .glow-border {
+      border: 2px solid #ff3b30;
+      box-shadow: 0 0 10px rgba(255, 59, 48, 0.4);
+    }
+    .glow-text {
       text-shadow: 0 0 8px rgba(255, 59, 48, 0.6);
     }
-    .glow-btn {
-      background-color: #ff3b30;
-      box-shadow: 0 0 15px rgba(255, 59, 48, 0.5);
+    .glow-box {
+      box-shadow: 0 0 15px rgba(255, 59, 48, 0.25);
     }
-    .glow-btn:hover {
-      box-shadow: 0 0 25px rgba(255, 59, 48, 0.8);
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d0d0d;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff3b30;
+      border-radius: 3px;
     }
   </style>
 </head>
-<body class="bg-darkBg text-gray-100 min-h-screen flex flex-col font-sans selection:bg-neonRed selection:text-white">
+<body class="min-h-screen flex flex-col justify-between max-w-md mx-auto p-4 border-x border-red-950/30 relative">
 
-  <!-- Main Container -->
-  <div class="max-w-md mx-auto w-full min-h-screen flex flex-col relative pb-24 border-x border-zinc-800/50 shadow-2xl bg-darkBg">
-    
-    <!-- Top Header -->
-    <header class="sticky top-0 z-30 bg-darkBg/90 backdrop-blur-md px-6 py-5 flex items-center justify-between border-b border-zinc-800">
-      <div class="flex items-center gap-3">
-        <div class="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
-          <i data-lucide="palmtree" class="w-6 h-6 text-neonRed"></i>
-        </div>
-        <div>
-          <h1 class="text-lg font-bold tracking-wider uppercase text-white flex items-center gap-2">
-            Sunset Sips
-          </h1>
-          <button onclick="toggleChairModal()" class="text-xs text-zinc-400 hover:text-neonRed flex items-center gap-1 mt-0.5 transition-colors">
-            <i data-lucide="map-pin" class="w-3 h-3 text-neonRed"></i>
-            <span id="currentChairDisplay">Lounger #12 (Main Beach)</span>
-            <i data-lucide="chevron-down" class="w-3 h-3"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <!-- QR Code Share Button -->
-        <button onclick="openQrModal()" title="Generate QR Code" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900/80 hover:border-neonRed text-zinc-300 hover:text-neonRed transition-all active:scale-95">
-          <i data-lucide="qr-code" class="w-5 h-5"></i>
-        </button>
-
-        <!-- Shopping Cart Button (Wireframe sketched on top right) -->
-        <button onclick="openCartModal()" class="relative p-3 rounded-xl border-2 border-neonRed bg-zinc-900/80 hover:bg-neonRed/10 transition-all active:scale-95 group">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform">
-            <circle cx="8" cy="21" r="1"/>
-            <circle cx="19" cy="21" r="1"/>
-            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
-          </svg>
-          <span id="cartCountBadge" class="absolute -top-2 -right-2 bg-neonRed text-white font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center shadow-lg border-2 border-darkBg hidden">
-            0
-          </span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Global Sync Status Bar -->
-    <div class="bg-zinc-900/90 px-6 py-2 text-[11px] text-zinc-400 border-b border-zinc-800/80 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span id="syncIndicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span id="syncText">Cloud Persistent Mode</span>
-      </div>
-      <button onclick="toggleOrdersModal()" class="text-neonRed hover:underline flex items-center gap-1 font-medium">
-        <i data-lucide="history" class="w-3 h-3"></i>
-        Cloud Orders (<span id="activeOrdersCount">0</span>)
-      </button>
-    </div>
-
-    <!-- Main Beverage List -->
-    <main class="flex-1 px-5 py-6 space-y-6">
-      <!-- Item 1: Cocktail -->
-      <div class="bg-cardBg rounded-2xl p-4 border border-zinc-800/80 hover:border-neonRed/50 transition-all flex gap-4 items-center group shadow-lg">
-        <div class="w-24 h-24 rounded-2xl bg-zinc-950 neon-border flex flex-col items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-          <svg class="w-12 h-12 text-neonRed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 22h8"/><path d="M12 11v11"/><path d="M19 3 5 3l7 8 7-8Z"/><path d="M12 7.5 15 4" stroke-dasharray="1 1"/>
-          </svg>
-          <span class="text-[10px] text-neonRed/80 font-mono mt-1 font-semibold">COCKTAIL</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-start gap-1">
-            <h3 class="font-bold text-base text-white truncate">Signature Cocktail</h3>
-            <span class="text-neonRed font-bold font-mono text-sm shrink-0">$14.00</span>
-          </div>
-          <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Passionfruit, white rum, crushed ice & coconut water garnish.</p>
-          <div class="mt-3 flex items-center justify-between">
-            <span class="text-[11px] text-zinc-500 font-mono">12 oz</span>
-            <button onclick="addToCart('Signature Cocktail', 14.00)" class="px-3 py-1 rounded-lg border border-neonRed text-neonRed hover:bg-neonRed hover:text-white transition-all text-xs font-semibold">
-              + Add
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Item 2: Mug -->
-      <div class="bg-cardBg rounded-2xl p-4 border border-zinc-800/80 hover:border-neonRed/50 transition-all flex gap-4 items-center group shadow-lg">
-        <div class="w-24 h-24 rounded-2xl bg-zinc-950 neon-border flex flex-col items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-          <svg class="w-12 h-12 text-neonRed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/>
-          </svg>
-          <span class="text-[10px] text-neonRed/80 font-mono mt-1 font-semibold">MUG / BREW</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-start gap-1">
-            <h3 class="font-bold text-base text-white truncate">Frosty Beach Lager</h3>
-            <span class="text-neonRed font-bold font-mono text-sm shrink-0">$8.50</span>
-          </div>
-          <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Served in a heavy sub-zero frozen glass mug.</p>
-          <div class="mt-3 flex items-center justify-between">
-            <span class="text-[11px] text-zinc-500 font-mono">500ml</span>
-            <button onclick="addToCart('Frosty Beach Lager', 8.50)" class="px-3 py-1 rounded-lg border border-neonRed text-neonRed hover:bg-neonRed hover:text-white transition-all text-xs font-semibold">
-              + Add
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Item 3: Wine Glass -->
-      <div class="bg-cardBg rounded-2xl p-4 border border-zinc-800/80 hover:border-neonRed/50 transition-all flex gap-4 items-center group shadow-lg">
-        <div class="w-24 h-24 rounded-2xl bg-zinc-950 neon-border flex flex-col items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-          <svg class="w-12 h-12 text-neonRed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a7 7 0 0 0 7-7V3H5v5a7 7 0 0 0 7 7Z"/>
-          </svg>
-          <span class="text-[10px] text-neonRed/80 font-mono mt-1 font-semibold">WINE GLASS</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-start gap-1">
-            <h3 class="font-bold text-base text-white truncate">Chilled Rosé Spritz</h3>
-            <span class="text-neonRed font-bold font-mono text-sm shrink-0">$12.00</span>
-          </div>
-          <p class="text-xs text-zinc-400 mt-1 line-clamp-2">French Riviera rosé, sparkling soda, fresh berries.</p>
-          <div class="mt-3 flex items-center justify-between">
-            <span class="text-[11px] text-zinc-500 font-mono">200ml</span>
-            <button onclick="addToCart('Chilled Rosé Spritz', 12.00)" class="px-3 py-1 rounded-lg border border-neonRed text-neonRed hover:bg-neonRed hover:text-white transition-all text-xs font-semibold">
-              + Add
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Item 4: Empty Wireframe Box -->
-      <div class="bg-cardBg rounded-2xl p-4 border border-zinc-800/80 hover:border-neonRed/50 transition-all flex gap-4 items-center group shadow-lg">
-        <div class="w-24 h-24 rounded-2xl bg-zinc-950 border-2 border-dashed border-neonRed/60 flex flex-col items-center justify-center shrink-0 group-hover:border-neonRed">
-          <i data-lucide="sparkles" class="w-8 h-8 text-neonRed animate-pulse"></i>
-          <span class="text-[10px] text-neonRed font-mono mt-1 font-bold">+ CUSTOM</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-start gap-1">
-            <h3 class="font-bold text-base text-white truncate">Build Custom Mix</h3>
-            <span class="text-neonRed font-bold font-mono text-sm shrink-0">$15.00</span>
-          </div>
-          <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Create your own spirit base & fruit syrup mix.</p>
-          <div class="mt-3 flex items-center justify-between">
-            <span class="text-[11px] text-zinc-500 font-mono">Custom</span>
-            <button onclick="addToCart('Custom Beach Mix', 15.00)" class="px-3 py-1 rounded-lg bg-neonRed/20 text-neonRed border border-neonRed/60 hover:bg-neonRed hover:text-white transition-all text-xs font-semibold">
-              + Add
-            </button>
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <!-- Bottom Quick Checkout Bar -->
-    <div class="fixed bottom-0 max-w-md w-full bg-darkBg/95 backdrop-blur-md border-t border-zinc-800 p-4 z-20 flex items-center justify-between">
+  <!-- TOP HEADER / NAV -->
+  <header class="flex justify-between items-center py-3 mb-6 border-b border-red-900/40">
+    <div class="flex items-center space-x-2">
+      <i data-lucide="palmtree" class="w-8 h-8 text-red-500"></i>
       <div>
-        <span class="text-xs text-zinc-400 block font-mono uppercase">Total</span>
-        <span id="bottomTotal" class="text-xl font-extrabold text-white font-mono">$0.00</span>
+        <h1 class="text-xl font-bold tracking-wider uppercase text-red-500 glow-text">Beach Drinks</h1>
+        <p class="text-xs text-red-400/70">Delivered to your towel</p>
       </div>
-      <button onclick="openCartModal()" id="bottomCheckoutBtn" class="glow-btn text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 text-sm disabled:opacity-50" disabled>
-        <span>Review Basket</span>
-        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+    </div>
+
+    <!-- Mode Toggle Button (Bar icon from drawing top right) -->
+    <button id="toggleBarModeBtn" onclick="requestBarAccess()" class="p-2.5 rounded-xl border border-red-500/60 bg-red-950/20 text-red-500 hover:bg-red-500 hover:text-black transition-all duration-200 relative group flex items-center justify-center">
+      <i data-lucide="shopping-bag" class="w-7 h-7"></i>
+      <span id="orderBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-black font-bold text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+    </button>
+  </header>
+
+  <!-- CUSTOMER VIEW (MAIN MENU) -->
+  <main id="customerView" class="flex-grow space-y-6">
+    <div class="text-sm font-medium text-red-400/80 mb-2 flex justify-between items-center">
+      <span>SELECT YOUR REFRESHMENT</span>
+      <span class="text-xs bg-red-950/60 px-2 py-1 rounded border border-red-900/50 text-red-400">Location: Spot #<span id="spotDisplay">--</span></span>
+    </div>
+
+    <!-- Drink List Container (Matches sketch layout with rounded square icons on left & details on right) -->
+    <div class="space-y-5" id="menuContainer">
+
+      <!-- Item 1: Tropical Cocktail -->
+      <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModal('Tropical Breeze Cocktail', '🍹', 12)">
+        <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
+          <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Hand drawn style cocktail SVG -->
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8m-4 0v-8m0 0l7-8H5l7 8zM17 5l1.5-2.5M6 3h12" />
+          </svg>
+        </div>
+        <div class="flex-grow space-y-2">
+          <div class="h-3.5 bg-red-500 rounded-full w-4/5"></div>
+          <div class="h-2.5 bg-red-500/60 rounded-full w-3/5"></div>
+          <div class="text-xs text-red-400 font-bold">$12.00 • Tropical Breeze Cocktail</div>
+        </div>
+      </div>
+
+      <!-- Item 2: Iced Coffee / Mug -->
+      <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModal('Beachside Cold Brew', '☕', 6)">
+        <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
+          <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Mug Icon -->
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+          </svg>
+        </div>
+        <div class="flex-grow space-y-2">
+          <div class="h-3.5 bg-red-500 rounded-full w-2/5"></div>
+          <div class="h-2.5 bg-red-500/60 rounded-full w-4/5"></div>
+          <div class="text-xs text-red-400 font-bold">$6.00 • Beachside Cold Brew</div>
+        </div>
+      </div>
+
+      <!-- Item 3: Wine / Champagne -->
+      <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModal('Chilled Rosé Wine', '🍷', 10)">
+        <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
+          <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Wine glass Icon -->
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v6m-4 0h8M6 3h12l-2 7a4 4 0 01-8 0L6 3z" />
+          </svg>
+        </div>
+        <div class="flex-grow space-y-2">
+          <div class="h-3.5 bg-red-500 rounded-full w-full"></div>
+          <div class="h-2.5 bg-red-500/60 rounded-full w-3/4"></div>
+          <div class="h-2 bg-red-500/40 rounded-full w-1/3"></div>
+          <div class="text-xs text-red-400 font-bold">$10.00 • Chilled Rosé Wine</div>
+        </div>
+      </div>
+
+      <!-- Item 4: Empty Container for Custom/Special Order -->
+      <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModal('Fresh Coconut Water', '🥥', 8)">
+        <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
+          <span class="text-2xl">🥥</span>
+        </div>
+        <div class="flex-grow space-y-2">
+          <div class="h-3.5 bg-red-500 rounded-full w-1/2"></div>
+          <div class="h-2.5 bg-red-500/60 rounded-full w-2/3"></div>
+          <div class="text-xs text-red-400 font-bold">$8.00 • Fresh Coconut Water</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Active User Orders Summary -->
+    <div class="mt-8 border-t border-red-900/40 pt-4">
+      <h3 class="text-sm font-bold text-red-400 mb-3 flex items-center">
+        <i data-lucide="clock" class="w-4 h-4 mr-2"></i> Your Recent Orders
+      </h3>
+      <div id="userOrdersList" class="space-y-2 text-xs">
+        <div class="text-red-500/50 italic py-2">No active orders right now. Tap a drink above to order!</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- BAR SERVICE VIEW (ADMIN) -->
+  <main id="barView" class="hidden flex-grow space-y-4">
+    <div class="flex justify-between items-center bg-red-950/30 p-3 rounded-xl border border-red-500/40">
+      <div>
+        <h2 class="font-bold text-red-500 uppercase tracking-wide flex items-center">
+          <i data-lucide="wine" class="w-5 h-5 mr-2"></i> Bar Service Mode
+        </h2>
+        <p class="text-xs text-red-400/80">Realtime incoming beach orders</p>
+      </div>
+      <button onclick="exitBarMode()" class="text-xs bg-red-900/40 hover:bg-red-900/80 text-red-300 px-3 py-1.5 rounded-lg border border-red-700/50">
+        Exit Mode
       </button>
     </div>
 
-  </div>
+    <!-- Live Orders Stream -->
+    <div id="liveOrdersContainer" class="space-y-3">
+      <div class="text-center py-8 text-red-500/60 text-sm">
+        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i>
+        Connecting to beach order service...
+      </div>
+    </div>
+  </main>
 
-  <!-- QR Code Modal -->
-  <div id="qrModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
-    <div class="bg-cardBg w-full max-w-sm rounded-2xl border border-zinc-800 p-6 shadow-2xl flex flex-col items-center text-center">
-      <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
-        <i data-lucide="qr-code" class="w-5 h-5 text-neonRed"></i> Mobile Beach Menu QR
-      </h3>
-      <p class="text-xs text-zinc-400 mb-4">Scan with phone camera to open menu on another device</p>
+  <!-- FOOTER -->
+  <footer class="mt-6 pt-4 border-t border-red-900/30 text-center text-xs text-red-500/50">
+    <p>Beach Service App • Tap top-right icon for Bar Access</p>
+  </footer>
 
-      <!-- Target URL Input -->
-      <div class="w-full mb-4">
-        <input type="text" id="qrTargetUrl" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-300 font-mono focus:outline-none focus:border-neonRed" placeholder="Enter your hosted URL...">
+
+  <!-- ORDER MODAL -->
+  <div id="orderModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 hidden z-50">
+    <div class="bg-black border-2 border-red-500 rounded-3xl p-6 w-full max-w-sm space-y-4 glow-box">
+      <div class="flex justify-between items-center border-b border-red-900/40 pb-3">
+        <h3 id="modalDrinkTitle" class="font-bold text-lg text-red-500">Drink Name</h3>
+        <button onclick="closeOrderModal()" class="text-red-500 hover:text-red-300">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
       </div>
 
-      <!-- Container for generated QR Code -->
-      <div class="p-4 bg-white rounded-2xl shadow-xl mb-4" id="qrcodeContainer"></div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs text-red-400 font-semibold mb-1">BEACH SPOT / UMBRELLA NUMBER</label>
+          <input type="text" id="spotNumberInput" placeholder="e.g. Umbrella #12 or Sunbed 4B" class="w-full bg-red-950/20 border border-red-500/60 rounded-xl p-3 text-red-300 placeholder-red-700 focus:outline-none focus:border-red-500 text-sm">
+        </div>
 
-      <div class="flex gap-2 w-full">
-        <button onclick="updateQrCode()" class="flex-1 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-xs text-zinc-300 font-semibold hover:border-neonRed">Regenerate QR</button>
-        <button onclick="closeQrModal()" class="flex-1 py-2.5 rounded-xl bg-neonRed text-white text-xs font-bold">Close</button>
+        <div>
+          <label class="block text-xs text-red-400 font-semibold mb-1">QUANTITY</label>
+          <div class="flex items-center space-x-4 bg-red-950/20 p-2 rounded-xl border border-red-500/40 justify-between">
+            <button onclick="adjustQty(-1)" class="w-10 h-10 rounded-lg bg-red-900/40 text-red-300 font-bold text-lg hover:bg-red-900/80">-</button>
+            <span id="qtyDisplay" class="text-xl font-bold text-red-400">1</span>
+            <button onclick="adjustQty(1)" class="w-10 h-10 rounded-lg bg-red-900/40 text-red-300 font-bold text-lg hover:bg-red-900/80">+</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs text-red-400 font-semibold mb-1">SPECIAL NOTES (OPTIONAL)</label>
+          <input type="text" id="specialNotesInput" placeholder="Extra ice, no sugar, lime..." class="w-full bg-red-950/20 border border-red-500/60 rounded-xl p-3 text-red-300 placeholder-red-700 focus:outline-none focus:border-red-500 text-sm">
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button id="submitOrderBtn" onclick="confirmOrder()" class="w-full py-3.5 bg-red-600 hover:bg-red-500 text-black font-bold text-sm uppercase tracking-wider rounded-xl transition shadow-md shadow-red-900/50 flex items-center justify-center space-x-2">
+          <span>Send Order (<span id="modalTotalPrice">$0.00</span>)</span>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Minimal JavaScript for Cart & QR Generator -->
-  <script>
-    let cart = [];
-
-    function addToCart(title, price) {
-      const existing = cart.find(i => i.title === title);
-      if (existing) { existing.qty += 1; } else { cart.push({ title, price, qty: 1 }); }
-      updateUI();
-    }
-
-    function updateUI() {
-      const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
-      const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+  <!-- BAR AUTH MODAL -->
+  <div id="barAuthModal" class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-black border-2 border-red-500 rounded-2xl p-6 w-full max-w-xs space-y-4 glow-box text-center">
+      <i data-lucide="shield-check" class="w-10 h-10 text-red-500 mx-auto"></i>
+      <h3 class="font-bold text-red-500">Bar Service Access</h3>
+      <p class="text-xs text-red-400/80">Enter password to enter bar queue management mode.</p>
       
-      const badge = document.getElementById('cartCountBadge');
-      badge.innerText = totalQty;
-      badge.classList.toggle('hidden', totalQty === 0);
+      <input type="password" id="barPasswordInput" placeholder="Password" class="w-full bg-red-950/20 border border-red-500/60 rounded-xl p-3 text-center text-red-300 placeholder-red-700 focus:outline-none focus:border-red-500 text-sm">
+      <div id="authError" class="text-xs text-red-500 hidden font-bold">Incorrect password</div>
 
-      document.getElementById('bottomTotal').innerText = `$${totalPrice.toFixed(2)}`;
-      document.getElementById('bottomCheckoutBtn').disabled = totalQty === 0;
-    }
+      <div class="flex space-x-2 pt-2">
+        <button onclick="closeBarAuthModal()" class="w-1/2 py-2.5 bg-red-950/50 text-red-400 rounded-xl hover:bg-red-900/50 text-xs font-semibold">Cancel</button>
+        <button onclick="validateBarPassword()" class="w-1/2 py-2.5 bg-red-600 text-black rounded-xl hover:bg-red-500 text-xs font-bold uppercase">Enter</button>
+      </div>
+    </div>
+  </div>
 
-    function openCartModal() { alert("Orders submitted here persist across devices via Firebase!"); }
-    function toggleChairModal() { alert("Set your lounger number!"); }
-    function toggleOrdersModal() { alert("Viewing shared cloud orders feed!"); }
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-red-600 text-black px-6 py-3 rounded-full font-bold text-xs shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center space-x-2 border border-red-400">
+    <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <span id="toastMsg">Order placed!</span>
+  </div>
 
-    // QR Code Functionality
-    let qrcodeObj = null;
+  <!-- Firebase Scripts (Modular loaded via script type module) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    function openQrModal() {
-      document.getElementById('qrModal').classList.remove('hidden');
-      const urlInput = document.getElementById('qrTargetUrl');
-      if (!urlInput.value) {
-        urlInput.value = window.location.href; // Defaults to current page URL
-      }
-      generateQR(urlInput.value);
-    }
+    // Provided Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBVnNwlU-qcmOrS_tnu7LWzadRGgODEr5U",
+      authDomain: "quick-host-91a9b.firebaseapp.com",
+      projectId: "quick-host-91a9b",
+      storageBucket: "quick-host-91a9b.firebasestorage.app",
+      messagingSenderId: "883203690265",
+      appId: "1:883203690265:web:d05e52dcf41c986edc7f88"
+    };
 
-    function closeQrModal() {
-      document.getElementById('qrModal').classList.add('hidden');
-    }
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    function updateQrCode() {
-      const url = document.getElementById('qrTargetUrl').value.trim();
-      if (url) generateQR(url);
-    }
+    // State Variables
+    let currentUserId = null;
+    let isBarMode = false;
+    let selectedDrink = null;
+    let currentQty = 1;
+    let activeOrders = [];
 
-    function generateQR(text) {
-      const container = document.getElementById('qrcodeContainer');
-      container.innerHTML = ''; // Clear existing
-      qrcodeObj = new QRCode(container, {
-        text: text,
-        width: 180,
-        height: 180,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
+    // Prompt Anonymous Auth
+    signInAnonymously(auth)
+      .then((userCred) => {
+        currentUserId = userCred.user.uid;
+        initRealtimeSync();
+      })
+      .catch((err) => {
+        console.error("Auth error:", err);
+      });
+
+    // Realtime Listener for Orders
+    function initRealtimeSync() {
+      const ordersRef = collection(db, "beach_orders");
+      
+      onSnapshot(ordersRef, (snapshot) => {
+        activeOrders = [];
+        snapshot.forEach((doc) => {
+          activeOrders.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Sort by timestamp newest first
+        activeOrders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+        updateUI();
+      }, (error) => {
+        console.error("Snapshot error:", error);
       });
     }
 
-    window.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
+    // Update UI based on active state & orders
+    function updateUI() {
+      // Update badge count
+      const pendingCount = activeOrders.filter(o => o.status !== 'delivered').length;
+      const badge = document.getElementById('orderBadge');
+      if (pendingCount > 0) {
+        badge.textContent = pendingCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      // Update User View Recent Orders
+      const userOrdersContainer = document.getElementById('userOrdersList');
+      const myOrders = activeOrders.filter(o => o.userId === currentUserId);
+
+      if (myOrders.length === 0) {
+        userOrdersContainer.innerHTML = `<div class="text-red-500/50 italic py-2">No active orders right now. Tap a drink above to order!</div>`;
+      } else {
+        userOrdersContainer.innerHTML = myOrders.map(order => `
+          <div class="flex justify-between items-center bg-red-950/20 p-2.5 rounded-xl border border-red-900/40">
+            <div>
+              <span class="font-bold text-red-400">${order.qty}x ${order.drinkName}</span>
+              <span class="text-red-500/60 block text-[10px]">Spot: ${order.spot} • ${order.notes || 'No extra notes'}</span>
+            </div>
+            <div class="text-right">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                order.status === 'ready' ? 'bg-green-950 text-green-400 border border-green-800' :
+                order.status === 'preparing' ? 'bg-yellow-950 text-yellow-400 border border-yellow-800' :
+                'bg-red-950 text-red-400 border border-red-800'
+              }">${order.status || 'Pending'}</span>
+              <div class="text-[10px] text-red-400 font-bold mt-0.5">$${(order.total || 0).toFixed(2)}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Update Bar View Orders
+      if (isBarMode) {
+        renderBarOrders();
+      }
+    }
+
+    // Render Bar Queue View
+    function renderBarOrders() {
+      const barContainer = document.getElementById('liveOrdersContainer');
+      
+      if (activeOrders.length === 0) {
+        barContainer.innerHTML = `
+          <div class="text-center py-12 text-red-500/50">
+            <i data-lucide="glass-water" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            No active orders in queue!
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      barContainer.innerHTML = activeOrders.map(order => `
+        <div class="bg-black border-2 ${order.status === 'ready' ? 'border-green-500/80' : 'border-red-500/80'} p-3.5 rounded-2xl space-y-2 glow-box">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="bg-red-500 text-black font-extrabold text-xs px-2 py-0.5 rounded-md uppercase">Spot #${order.spot}</span>
+              <h4 class="font-bold text-base text-red-400 mt-1">${order.qty}x ${order.drinkName}</h4>
+            </div>
+            <span class="text-xs text-red-400 font-mono font-bold">$${(order.total || 0).toFixed(2)}</span>
+          </div>
+
+          ${order.notes ? `<div class="text-xs bg-red-950/40 p-2 rounded-lg border border-red-900/40 text-red-300">Note: ${order.notes}</div>` : ''}
+
+          <div class="flex items-center justify-between pt-2 border-t border-red-900/40">
+            <div class="text-[10px] text-red-500/60">${new Date(order.createdAt?.seconds * 1000 || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+            
+            <div class="flex space-x-2">
+              <button onclick="updateOrderStatus('${order.id}', 'preparing')" class="px-2.5 py-1 text-[11px] rounded-lg border ${order.status === 'preparing' ? 'bg-yellow-500 text-black font-bold' : 'border-yellow-600/60 text-yellow-500 hover:bg-yellow-950/40'}">
+                Preparing
+              </button>
+              <button onclick="updateOrderStatus('${order.id}', 'ready')" class="px-2.5 py-1 text-[11px] rounded-lg border ${order.status === 'ready' ? 'bg-green-500 text-black font-bold' : 'border-green-600/60 text-green-500 hover:bg-green-950/40'}">
+                Ready
+              </button>
+              <button onclick="completeOrder('${order.id}')" class="px-2 py-1 text-[11px] rounded-lg bg-red-950/80 text-red-400 hover:bg-red-900 border border-red-800" title="Complete & Remove">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // Expose Functions globally for HTML handlers
+    window.openOrderModal = function(name, icon, price) {
+      selectedDrink = { name, icon, price };
+      currentQty = 1;
+      document.getElementById('modalDrinkTitle').textContent = `${icon} ${name}`;
+      document.getElementById('qtyDisplay').textContent = currentQty;
+      document.getElementById('specialNotesInput').value = '';
+      
+      // Auto-fill saved spot if exists
+      const savedSpot = localStorage.getItem('beach_spot') || '';
+      document.getElementById('spotNumberInput').value = savedSpot;
+
+      updateModalPrice();
+      document.getElementById('orderModal').classList.remove('hidden');
+    };
+
+    window.closeOrderModal = function() {
+      document.getElementById('orderModal').classList.add('hidden');
+    };
+
+    window.adjustQty = function(delta) {
+      if (currentQty + delta >= 1) {
+        currentQty += delta;
+        document.getElementById('qtyDisplay').textContent = currentQty;
+        updateModalPrice();
+      }
+    };
+
+    function updateModalPrice() {
+      if (!selectedDrink) return;
+      const total = selectedDrink.price * currentQty;
+      document.getElementById('modalTotalPrice').textContent = `$${total.toFixed(2)}`;
+    }
+
+    window.confirmOrder = async function() {
+      const spot = document.getElementById('spotNumberInput').value.trim();
+      const notes = document.getElementById('specialNotesInput').value.trim();
+
+      if (!spot) {
+        alert("Please enter your Umbrella or Spot number so we can find you!");
+        return;
+      }
+
+      // Save spot locally for convenience
+      localStorage.setItem('beach_spot', spot);
+      document.getElementById('spotDisplay').textContent = spot;
+
+      const submitBtn = document.getElementById('submitOrderBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>Sending...</span>`;
+
+      try {
+        await addDoc(collection(db, "beach_orders"), {
+          drinkName: selectedDrink.name,
+          price: selectedDrink.price,
+          qty: currentQty,
+          total: selectedDrink.price * currentQty,
+          spot: spot,
+          notes: notes,
+          userId: currentUserId,
+          status: 'pending',
+          createdAt: serverTimestamp()
+        });
+
+        closeOrderModal();
+        showToast("Order sent to the Bar!");
+      } catch (e) {
+        console.error("Error submitting order:", e);
+        alert("Could not send order. Please try again.");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    };
+
+    // Bar Mode Auth logic
+    window.requestBarAccess = function() {
+      if (isBarMode) {
+        exitBarMode();
+      } else {
+        document.getElementById('barAuthModal').classList.remove('hidden');
+        document.getElementById('barPasswordInput').focus();
+      }
+    };
+
+    window.closeBarAuthModal = function() {
+      document.getElementById('barAuthModal').classList.add('hidden');
+      document.getElementById('authError').classList.add('hidden');
+      document.getElementById('barPasswordInput').value = '';
+    };
+
+    window.validateBarPassword = function() {
+      const pass = document.getElementById('barPasswordInput').value;
+      if (pass === "trustme") {
+        isBarMode = true;
+        closeBarAuthModal();
+        document.getElementById('customerView').classList.add('hidden');
+        document.getElementById('barView').classList.remove('hidden');
+        renderBarOrders();
+        showToast("Switched to Bar Mode");
+      } else {
+        document.getElementById('authError').classList.remove('hidden');
+      }
+    };
+
+    window.exitBarMode = function() {
+      isBarMode = false;
+      document.getElementById('barView').classList.add('hidden');
+      document.getElementById('customerView').classList.remove('hidden');
+    };
+
+    window.updateOrderStatus = async function(orderId, newStatus) {
+      try {
+        const orderRef = doc(db, "beach_orders", orderId);
+        await updateDoc(orderRef, { status: newStatus });
+      } catch (err) {
+        console.error("Failed to update status:", err);
+      }
+    };
+
+    window.completeOrder = async function(orderId) {
+      try {
+        const orderRef = doc(db, "beach_orders", orderId);
+        await deleteDoc(orderRef);
+        showToast("Order completed & cleared");
+      } catch (err) {
+        console.error("Failed to complete order:", err);
+      }
+    };
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+
+    // Set spot display on load if saved
+    const savedSpot = localStorage.getItem('beach_spot');
+    if (savedSpot) {
+      document.getElementById('spotDisplay').textContent = savedSpot;
+    }
+
+    // Initialize Lucide icons
+    lucide.createIcons();
   </script>
 </body>
 </html>
