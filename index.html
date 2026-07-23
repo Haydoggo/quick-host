@@ -39,6 +39,44 @@
       border-radius: 3px;
     }
   </style>
+
+  <!-- HUMAN-EDITABLE MENU CONFIGURATION (JSON) -->
+  <script id="menuConfig" type="application/json">
+  [
+    {
+      "id": "tropical-breeze",
+      "name": "Tropical Breeze Cocktail",
+      "icon": "🍹",
+      "iconType": "cocktail",
+      "description": "Rum, Pineapple, Lime & Mint",
+      "price": 12.00
+    },
+    {
+      "id": "craft-beer",
+      "name": "Ice-Cold Craft Beer",
+      "icon": "🍺",
+      "iconType": "beer",
+      "description": "Crisp beachside lager or aromatic IPA",
+      "price": 7.00
+    },
+    {
+      "id": "chilled-rose",
+      "name": "Chilled Rosé Wine",
+      "icon": "🍷",
+      "iconType": "wine",
+      "description": "Crisp French Rosé served chilled",
+      "price": 10.00
+    },
+    {
+      "id": "fresh-coconut",
+      "name": "Fresh Coconut Water",
+      "icon": "🥥",
+      "iconType": "coconut",
+      "description": "Whole coconut served fresh & chilled",
+      "price": 8.00
+    }
+  ]
+  </script>
 </head>
 <body class="min-h-screen flex flex-col justify-between max-w-md mx-auto p-4 border-x border-red-950/30 relative">
 
@@ -66,66 +104,9 @@
       <span class="text-xs bg-red-950/60 px-2 py-1 rounded border border-red-900/50 text-red-400">Location: Spot #<span id="spotDisplay">--</span></span>
     </div>
 
-    <!-- Drink List Container (Matches sketch layout with rounded square icons on left & details on right) -->
+    <!-- Drink List Container (Dynamically populated from #menuConfig JSON) -->
     <div class="space-y-5" id="menuContainer">
-
-      <!-- Item 1: Tropical Cocktail -->
-      <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModal('Tropical Breeze Cocktail', '🍹', 12)">
-        <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
-          <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <!-- Hand drawn style cocktail SVG -->
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8m-4 0v-8m0 0l7-8H5l7 8zM17 5l1.5-2.5M6 3h12" />
-          </svg>
-        </div>
-        <div class="flex-grow space-y-1">
-          <h3 class="font-bold text-base text-red-500">Tropical Breeze Cocktail</h3>
-          <p class="text-xs text-red-400/70">Rum, Pineapple, Lime & Mint</p>
-          <div class="text-xs text-red-400 font-bold mt-1">$12.00</div>
-        </div>
-      </div>
-
-      <!-- Item 2: Iced Coffee / Mug -->
-      <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModal('Beachside Cold Brew', '☕', 6)">
-        <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
-          <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <!-- Mug Icon -->
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
-          </svg>
-        </div>
-        <div class="flex-grow space-y-1">
-          <h3 class="font-bold text-base text-red-500">Beachside Cold Brew</h3>
-          <p class="text-xs text-red-400/70">Double shot cold brew over ice</p>
-          <div class="text-xs text-red-400 font-bold mt-1">$6.00</div>
-        </div>
-      </div>
-
-      <!-- Item 3: Wine / Champagne -->
-      <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModal('Chilled Rosé Wine', '🍷', 10)">
-        <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
-          <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <!-- Wine glass Icon -->
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v6m-4 0h8M6 3h12l-2 7a4 4 0 01-8 0L6 3z" />
-          </svg>
-        </div>
-        <div class="flex-grow space-y-1">
-          <h3 class="font-bold text-base text-red-500">Chilled Rosé Wine</h3>
-          <p class="text-xs text-red-400/70">Crisp French Rosé served chilled</p>
-          <div class="text-xs text-red-400 font-bold mt-1">$10.00</div>
-        </div>
-      </div>
-
-      <!-- Item 4: Empty Container for Custom/Special Order -->
-      <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModal('Fresh Coconut Water', '🥥', 8)">
-        <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
-          <span class="text-2xl">🥥</span>
-        </div>
-        <div class="flex-grow space-y-1">
-          <h3 class="font-bold text-base text-red-500">Fresh Coconut Water</h3>
-          <p class="text-xs text-red-400/70">Whole coconut served fresh & chilled</p>
-          <div class="text-xs text-red-400 font-bold mt-1">$8.00</div>
-        </div>
-      </div>
-
+      <!-- Items dynamically rendered from JSON config -->
     </div>
 
     <!-- Active User Orders Summary -->
@@ -257,15 +238,60 @@
     let selectedDrink = null;
     let currentQty = 1;
     let activeOrders = [];
+    let menuItems = [];
+
+    function loadMenuConfig() {
+      try {
+        const configText = document.getElementById('menuConfig').textContent;
+        menuItems = JSON.parse(configText);
+      } catch (err) {
+        console.error("Failed to parse menu JSON config:", err);
+        menuItems = [];
+      }
+    }
+
+    function getIconSvg(item) {
+      if (item.iconType === 'cocktail') {
+        return `<svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8m-4 0v-8m0 0l7-8H5l7 8zM17 5l1.5-2.5M6 3h12" /></svg>`;
+      } else if (item.iconType === 'beer') {
+        return `<svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 009-9H3a9 9 0 009 9zM12 3v9M7 6l10 0" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12h-2a2 2 0 00-2 2v2a2 2 0 002 2h2v-6z" /></svg>`;
+      } else if (item.iconType === 'wine') {
+        return `<svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v6m-4 0h8M6 3h12l-2 7a4 4 0 01-8 0L6 3z" /></svg>`;
+      } else {
+        return `<span class="text-3xl">${item.icon || '🍹'}</span>`;
+      }
+    }
+
+    function renderMenu() {
+      const container = document.getElementById('menuContainer');
+      if (!container) return;
+
+      container.innerHTML = menuItems.map(item => `
+        <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-red-500/80 hover:border-red-500 transition cursor-pointer shadow-lg shadow-red-950/20" onclick="openOrderModalById('${item.id}')">
+          <div class="w-20 h-20 rounded-2xl border-2 border-red-500 flex items-center justify-center bg-red-950/20 shrink-0">
+            ${getIconSvg(item)}
+          </div>
+          <div class="flex-grow space-y-1">
+            <h3 class="font-bold text-base text-red-500">${item.name}</h3>
+            <p class="text-xs text-red-400/70">${item.description}</p>
+            <div class="text-xs text-red-400 font-bold mt-1">$${item.price.toFixed(2)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
 
     // Prompt Anonymous Auth
     signInAnonymously(auth)
       .then((userCred) => {
         currentUserId = userCred.user.uid;
+        loadMenuConfig();
+        renderMenu();
         initRealtimeSync();
       })
       .catch((err) => {
         console.error("Auth error:", err);
+        loadMenuConfig();
+        renderMenu();
       });
 
     // Realtime Listener for Orders
@@ -378,6 +404,13 @@
     }
 
     // Expose Functions globally for HTML handlers
+    window.openOrderModalById = function(itemId) {
+      const item = menuItems.find(i => i.id === itemId);
+      if (item) {
+        window.openOrderModal(item.name, item.icon, item.price);
+      }
+    };
+
     window.openOrderModal = function(name, icon, price) {
       selectedDrink = { name, icon, price };
       currentQty = 1;
