@@ -37,9 +37,9 @@
       const rgb = hexToRgb(hex);
       const root = document.documentElement;
 
-      // CSS Custom Variables
+      // CSS Custom Variables (using space-separated channels for valid CSS rgb/rgba syntax)
       root.style.setProperty('--primary', hex);
-      root.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+      root.style.setProperty('--primary-rgb', `${rgb.r} ${rgb.g} ${rgb.b}`);
       root.style.setProperty('--primary-hover', adjustBrightness(hex, 0.2));
       root.style.setProperty('--primary-light', adjustBrightness(hex, 0.4));
       root.style.setProperty('--primary-dark', adjustBrightness(hex, -0.45));
@@ -69,7 +69,7 @@
               200: 'rgb(var(--primary-rgb) / 0.2)',
               300: 'rgb(var(--primary-rgb) / 0.3)',
               400: 'rgb(var(--primary-rgb) / 0.5)',
-              500: 'rgb(var(--primary-rgb) / 1)',
+              500: 'rgb(var(--primary-rgb) / <alpha-value>)',
               600: 'var(--primary-hover)',
               700: 'var(--primary-dark)',
               800: 'var(--primary-dim)',
@@ -95,13 +95,13 @@
     /* Dynamic Neon Glow Effect based on --primary-rgb */
     .glow-border {
       border: 2px solid var(--primary);
-      box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.4);
+      box-shadow: 0 0 10px rgb(var(--primary-rgb) / 0.4);
     }
     .glow-text {
-      text-shadow: 0 0 8px rgba(var(--primary-rgb), 0.6);
+      text-shadow: 0 0 8px rgb(var(--primary-rgb) / 0.6);
     }
     .glow-box {
-      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.25);
+      box-shadow: 0 0 15px rgb(var(--primary-rgb) / 0.25);
     }
 
     /* Custom Scrollbar */
@@ -257,7 +257,7 @@
       </div>
 
       <div class="pt-2">
-        <button id="submitOrderBtn" onclick="confirmOrder()" class="w-full py-3.5 bg-primary-500 hover:bg-primary-600 text-black font-bold text-sm uppercase tracking-wider rounded-xl transition shadow-md shadow-primary-900/50 flex items-center justify-center space-x-2">
+        <button id="submitOrderBtn" onclick="confirmOrder()" class="w-full py-3.5 bg-primary-500 hover:bg-primary-hover text-black font-bold text-sm uppercase tracking-wider rounded-xl transition shadow-md shadow-primary-950/50 flex items-center justify-center space-x-2">
           <span>Send Order (<span id="modalTotalPrice">$0.00</span>)</span>
         </button>
       </div>
@@ -314,17 +314,27 @@
       if (!container) return;
 
       container.innerHTML = menuItems.map(item => `
-        <div class="flex items-center space-x-4 p-3 rounded-2xl bg-black border-2 border-primary-500/80 hover:border-primary-500 transition cursor-pointer shadow-lg shadow-primary-950/20" onclick="openOrderModalById('${item.id}')">
-          <div class="w-20 h-20 rounded-2xl border-2 border-primary-500 flex items-center justify-center bg-primary-950/20 shrink-0">
-            <span class="text-4xl select-none">${item.icon || '🍹'}</span>
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-black border-2 border-primary-500/80 hover:border-primary-500 transition cursor-pointer shadow-lg shadow-primary-950/20 group" onclick="openOrderModalById('${item.id}')">
+          <div class="flex items-center space-x-3.5 flex-grow mr-2 min-w-0">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-primary-500 flex items-center justify-center bg-primary-950/20 shrink-0">
+              <span class="text-3xl sm:text-4xl select-none">${item.icon || '🍹'}</span>
+            </div>
+            <div class="space-y-1 min-w-0 flex-1">
+              <h3 class="font-bold text-sm sm:text-base text-primary-500 truncate">${item.name}</h3>
+              <p class="text-xs text-primary-400/70 line-clamp-2">${item.description}</p>
+              <div class="text-xs text-primary-400 font-bold mt-1">$${item.price.toFixed(2)}</div>
+            </div>
           </div>
-          <div class="flex-grow space-y-1">
-            <h3 class="font-bold text-base text-primary-500">${item.name}</h3>
-            <p class="text-xs text-primary-400/70">${item.description}</p>
-            <div class="text-xs text-primary-400 font-bold mt-1">$${item.price.toFixed(2)}</div>
-          </div>
+          <button onclick="event.stopPropagation(); openOrderModalById('${item.id}')" class="px-3.5 py-2 bg-primary-500 hover:bg-primary-hover text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition shadow-md shadow-primary-950/50 shrink-0 flex items-center space-x-1.5 active:scale-95">
+            <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
+            <span>Order</span>
+          </button>
         </div>
       `).join('');
+
+      if (window.lucide) {
+        lucide.createIcons();
+      }
     }
 
     // Prompt Anonymous Auth
@@ -496,7 +506,7 @@
       const notes = document.getElementById('specialNotesInput').value.trim();
 
       if (!spot) {
-        alert("Please enter your Umbrella or Spot number so we can find you!");
+        showToast("Please enter your Umbrella or Spot number!");
         return;
       }
 
@@ -525,9 +535,11 @@
         showToast("Order sent to the Bar!");
       } catch (e) {
         console.error("Error submitting order:", e);
-        alert("Could not send order. Please try again.");
+        showToast("Could not send order. Please try again.");
       } finally {
         submitBtn.disabled = false;
+        document.getElementById('submitOrderBtn').innerHTML = `<span>Send Order (<span id="modalTotalPrice">$0.00</span>)</span>`;
+        updateModalPrice();
       }
     };
 
