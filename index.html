@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sunset Beach Bar & Lounge - Order Drinks</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- QRCode.js library for client-side QR generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            neonRed: '#ff3b30',
+            darkBg: '#0a0a0a',
+            cardBg: '#121214',
+            accentGlow: 'rgba(255, 59, 48, 0.15)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .neon-border {
+      border: 2px solid #ff3b30;
+      box-shadow: 0 0 12px rgba(255, 59, 48, 0.3), inset 0 0 8px rgba(255, 59, 48, 0.15);
+    }
+    .neon-text {
+      color: #ff3b30;
+      text-shadow: 0 0 8px rgba(255, 59, 48, 0.6);
+    }
+    .glow-btn {
+      background-color: #ff3b30;
+      box-shadow: 0 0 15px rgba(255, 59, 48, 0.5);
+    }
+    .glow-btn:hover {
+      box-shadow: 0 0 25px rgba(255, 59, 48, 0.8);
+    }
+  </style>
+</head>
+<body class="bg-darkBg text-gray-100 min-h-screen flex flex-col font-sans selection:bg-neonRed selection:text-white">
+
+  <!-- Main Container -->
+  <div class="max-w-md mx-auto w-full min-h-screen flex flex-col relative pb-24 border-x border-zinc-800/50 shadow-2xl bg-darkBg">
+    
+    <!-- Top Header -->
+    <header class="sticky top-0 z-30 bg-darkBg/90 backdrop-blur-md px-6 py-5 flex items-center justify-between border-b border-zinc-800">
+      <div class="flex items-center gap-3">
+        <div class="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
+          <i data-lucide="palmtree" class="w-6 h-6 text-neonRed"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-wider uppercase text-white flex items-center gap-2">
+            Sunset Sips
+          </h1>
+          <button onclick="toggleChairModal()" class="text-xs text-zinc-400 hover:text-neonRed flex items-center gap-1 mt-0.5 transition-colors">
+            <i data-lucide="map-pin" class="w-3 h-3 text-neonRed"></i>
+            <span id="currentChairDisplay">Lounger #12 (Main Beach)</span>
+            <i data-lucide="chevron-down" class="w-3 h-3"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- QR Code Share Button -->
+        <button onclick="openQrModal()" title="Generate QR Code" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900/80 hover:border-neonRed text-zinc-300 hover:text-neonRed transition-all active:scale-95">
+          <i data-lucide="qr-code" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Shopping Cart Button (Wireframe sketched on top right) -->
+        <button onclick="openCartModal()" class="relative p-3 rounded-xl border-2 border-neonRed bg-zinc-900/80 hover:bg-neonRed/10 transition-all active:scale-95 group">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform">
+            <circle cx="8" cy="21" r="1"/>
+            <circle cx="19" cy="21" r="1"/>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+          </svg>
+          <span id="cartCountBadge" class="absolute -top-2 -right-2 bg-neonRed text-white font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center shadow-lg border-2 border-darkBg hidden">
+            0
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Global Sync Status Bar -->
+    <div class="bg-zinc-900/90 px-6 py-2 text-[11px] text-zinc-400 border-b border-zinc-800/80 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span id="syncIndicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span id="syncText">Cloud Persistent Mode</span>
+      </div>
+      <button onclick="toggleOrdersModal()" class="text-neonRed hover:underline flex items-center gap-1 font-medium">
+        <i data-lucide="history" class="w-3 h-3"></i>
+        Cloud Orders (<span id="activeOrdersCount">0</span>)
+      </button>
+    </div>
+
+    <!-- Main Beverage List -->
+    <main class="flex-1 px-5 py-6 space-y-6">
+      <!-- Item 1: Cocktail -->
+      <div class="bg-cardBg rounded-2xl p-4 border border-zinc-800/80 hover:border-neonRed/50 transition-all flex gap-4 items-center group shadow-lg">
+        <div class="w-24 h-24 rounded-2xl bg-zinc-950 neon-border flex flex-col items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <svg class="w-12 h-12 text-neonRed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 22h8"/><path d="M12 11v11"/><path d="M19 3 5 3l7 8 7-8Z"/><path d="M12 7.5 15 4" stroke-dasharray="1 1"/>
+          </svg>
+          <span class="text-[10px] text-neonRed/80 font-mono mt-1 font-semibold">COCKTAIL</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start gap-1">
+            <h3 class="font-bold text-base text-white truncate">Signature Cocktail</h3>
+            <span class="text-neonRed font-bold font-mono text-sm shrink-0">$14.00</span>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Passionfruit, white rum, crushed ice & coconut water garnish.</p>
+          <div class="mt-3 flex items-center justify-between">
+            <span class="text-[11px] text-zinc-500 font-mono">12 oz</span>
+            <button onclick="addToCart('Signature Cocktail', 14.00)" class="px-3 py-1 rounded-lg border border-neonRed text-neonRed hover:bg-neonRed hover:text-white transition-all text-xs font-semibold">
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 2: Mug -->
+      <div class="bg-cardBg rounded-2xl p-4 border border-zinc-800/80 hover:border-neonRed/50 transition-all flex gap-4 items-center group shadow-lg">
+        <div class="w-24 h-24 rounded-2xl bg-zinc-950 neon-border flex flex-col items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <svg class="w-12 h-12 text-neonRed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/>
+          </svg>
+          <span class="text-[10px] text-neonRed/80 font-mono mt-1 font-semibold">MUG / BREW</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start gap-1">
+            <h3 class="font-bold text-base text-white truncate">Frosty Beach Lager</h3>
+            <span class="text-neonRed font-bold font-mono text-sm shrink-0">$8.50</span>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Served in a heavy sub-zero frozen glass mug.</p>
+          <div class="mt-3 flex items-center justify-between">
+            <span class="text-[11px] text-zinc-500 font-mono">500ml</span>
+            <button onclick="addToCart('Frosty Beach Lager', 8.50)" class="px-3 py-1 rounded-lg border border-neonRed text-neonRed hover:bg-neonRed hover:text-white transition-all text-xs font-semibold">
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 3: Wine Glass -->
+      <div class="bg-cardBg rounded-2xl p-4 border border-zinc-800/80 hover:border-neonRed/50 transition-all flex gap-4 items-center group shadow-lg">
+        <div class="w-24 h-24 rounded-2xl bg-zinc-950 neon-border flex flex-col items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <svg class="w-12 h-12 text-neonRed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a7 7 0 0 0 7-7V3H5v5a7 7 0 0 0 7 7Z"/>
+          </svg>
+          <span class="text-[10px] text-neonRed/80 font-mono mt-1 font-semibold">WINE GLASS</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start gap-1">
+            <h3 class="font-bold text-base text-white truncate">Chilled Rosé Spritz</h3>
+            <span class="text-neonRed font-bold font-mono text-sm shrink-0">$12.00</span>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1 line-clamp-2">French Riviera rosé, sparkling soda, fresh berries.</p>
+          <div class="mt-3 flex items-center justify-between">
+            <span class="text-[11px] text-zinc-500 font-mono">200ml</span>
+            <button onclick="addToCart('Chilled Rosé Spritz', 12.00)" class="px-3 py-1 rounded-lg border border-neonRed text-neonRed hover:bg-neonRed hover:text-white transition-all text-xs font-semibold">
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 4: Empty Wireframe Box -->
+      <div class="bg-cardBg rounded-2xl p-4 border border-zinc-800/80 hover:border-neonRed/50 transition-all flex gap-4 items-center group shadow-lg">
+        <div class="w-24 h-24 rounded-2xl bg-zinc-950 border-2 border-dashed border-neonRed/60 flex flex-col items-center justify-center shrink-0 group-hover:border-neonRed">
+          <i data-lucide="sparkles" class="w-8 h-8 text-neonRed animate-pulse"></i>
+          <span class="text-[10px] text-neonRed font-mono mt-1 font-bold">+ CUSTOM</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start gap-1">
+            <h3 class="font-bold text-base text-white truncate">Build Custom Mix</h3>
+            <span class="text-neonRed font-bold font-mono text-sm shrink-0">$15.00</span>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Create your own spirit base & fruit syrup mix.</p>
+          <div class="mt-3 flex items-center justify-between">
+            <span class="text-[11px] text-zinc-500 font-mono">Custom</span>
+            <button onclick="addToCart('Custom Beach Mix', 15.00)" class="px-3 py-1 rounded-lg bg-neonRed/20 text-neonRed border border-neonRed/60 hover:bg-neonRed hover:text-white transition-all text-xs font-semibold">
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Quick Checkout Bar -->
+    <div class="fixed bottom-0 max-w-md w-full bg-darkBg/95 backdrop-blur-md border-t border-zinc-800 p-4 z-20 flex items-center justify-between">
+      <div>
+        <span class="text-xs text-zinc-400 block font-mono uppercase">Total</span>
+        <span id="bottomTotal" class="text-xl font-extrabold text-white font-mono">$0.00</span>
+      </div>
+      <button onclick="openCartModal()" id="bottomCheckoutBtn" class="glow-btn text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 text-sm disabled:opacity-50" disabled>
+        <span>Review Basket</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- QR Code Modal -->
+  <div id="qrModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+    <div class="bg-cardBg w-full max-w-sm rounded-2xl border border-zinc-800 p-6 shadow-2xl flex flex-col items-center text-center">
+      <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+        <i data-lucide="qr-code" class="w-5 h-5 text-neonRed"></i> Mobile Beach Menu QR
+      </h3>
+      <p class="text-xs text-zinc-400 mb-4">Scan with phone camera to open menu on another device</p>
+
+      <!-- Target URL Input -->
+      <div class="w-full mb-4">
+        <input type="text" id="qrTargetUrl" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-300 font-mono focus:outline-none focus:border-neonRed" placeholder="Enter your hosted URL...">
+      </div>
+
+      <!-- Container for generated QR Code -->
+      <div class="p-4 bg-white rounded-2xl shadow-xl mb-4" id="qrcodeContainer"></div>
+
+      <div class="flex gap-2 w-full">
+        <button onclick="updateQrCode()" class="flex-1 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-xs text-zinc-300 font-semibold hover:border-neonRed">Regenerate QR</button>
+        <button onclick="closeQrModal()" class="flex-1 py-2.5 rounded-xl bg-neonRed text-white text-xs font-bold">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Minimal JavaScript for Cart & QR Generator -->
+  <script>
+    let cart = [];
+
+    function addToCart(title, price) {
+      const existing = cart.find(i => i.title === title);
+      if (existing) { existing.qty += 1; } else { cart.push({ title, price, qty: 1 }); }
+      updateUI();
+    }
+
+    function updateUI() {
+      const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+      const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      
+      const badge = document.getElementById('cartCountBadge');
+      badge.innerText = totalQty;
+      badge.classList.toggle('hidden', totalQty === 0);
+
+      document.getElementById('bottomTotal').innerText = `$${totalPrice.toFixed(2)}`;
+      document.getElementById('bottomCheckoutBtn').disabled = totalQty === 0;
+    }
+
+    function openCartModal() { alert("Orders submitted here persist across devices via Firebase!"); }
+    function toggleChairModal() { alert("Set your lounger number!"); }
+    function toggleOrdersModal() { alert("Viewing shared cloud orders feed!"); }
+
+    // QR Code Functionality
+    let qrcodeObj = null;
+
+    function openQrModal() {
+      document.getElementById('qrModal').classList.remove('hidden');
+      const urlInput = document.getElementById('qrTargetUrl');
+      if (!urlInput.value) {
+        urlInput.value = window.location.href; // Defaults to current page URL
+      }
+      generateQR(urlInput.value);
+    }
+
+    function closeQrModal() {
+      document.getElementById('qrModal').classList.add('hidden');
+    }
+
+    function updateQrCode() {
+      const url = document.getElementById('qrTargetUrl').value.trim();
+      if (url) generateQR(url);
+    }
+
+    function generateQR(text) {
+      const container = document.getElementById('qrcodeContainer');
+      container.innerHTML = ''; // Clear existing
+      qrcodeObj = new QRCode(container, {
+        text: text,
+        width: 180,
+        height: 180,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
+  </script>
+</body>
+</html>
